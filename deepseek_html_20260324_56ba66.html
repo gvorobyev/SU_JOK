@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Сам себе Су Джок доктор — интерактивный помощник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #fef7e8;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            color: #2c2418;
+            line-height: 1.5;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* шапка */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem 1rem 1rem;
+            background: #fff6ea;
+            border-radius: 3rem;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.03);
+            border: 1px solid #ffe1b9;
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #b45f2b;
+            letter-spacing: -0.3px;
+        }
+        .sub {
+            font-size: 1rem;
+            color: #7a5a3a;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+        .intro {
+            background: #e7f0e4;
+            padding: 1rem 1.5rem;
+            border-radius: 2rem;
+            margin: 1.5rem 0 1rem;
+            font-size: 0.95rem;
+            border-left: 6px solid #7c9c6e;
+        }
+
+        /* главная сетка */
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        /* левая панель — список симптомов */
+        .symptoms-panel {
+            flex: 1.2;
+            min-width: 260px;
+            background: #ffffffdd;
+            backdrop-filter: blur(2px);
+            background: white;
+            border-radius: 2rem;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #ffe0b5;
+        }
+        .symptoms-panel h2 {
+            font-size: 1.5rem;
+            border-left: 5px solid #d48c3b;
+            padding-left: 1rem;
+            margin-bottom: 1.2rem;
+            color: #4a3520;
+        }
+        .symptom-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .symptom-btn {
+            background: #faf2e6;
+            border: none;
+            text-align: left;
+            padding: 0.9rem 1rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #4a2e1a;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #f0dec9;
+        }
+        .symptom-btn:hover {
+            background: #f7e5d3;
+            transform: translateX(4px);
+            border-color: #dbb47a;
+        }
+        .symptom-btn.active {
+            background: #e6cfb0;
+            border-left: 8px solid #b45f2b;
+            font-weight: 600;
+            color: #3b2a1a;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .emoji-icon {
+            font-size: 1.5rem;
+        }
+
+        /* правая панель — результат */
+        .advice-panel {
+            flex: 2.5;
+            min-width: 300px;
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem 1.8rem;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+            border: 1px solid #ffe2bc;
+        }
+        .advice-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px dashed #f0dbb8;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .advice-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #9b5e2c;
+        }
+        .badge {
+            background: #e9dccc;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin: 1.2rem 0 0.6rem 0;
+            color: #7b4c26;
+            border-left: 4px solid #e6b17e;
+            padding-left: 12px;
+        }
+        .point-location {
+            background: #fdf8f0;
+            padding: 1rem 1.3rem;
+            border-radius: 1.5rem;
+            margin: 1rem 0;
+            font-size: 1rem;
+            border: 1px solid #f3e2ce;
+        }
+        .howto-step {
+            background: #f9f3ea;
+            border-radius: 1.2rem;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+        .howto-step strong {
+            color: #bc6f2c;
+        }
+        .warning-note {
+            background: #fff0e0;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1.2rem;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            border-left: 3px solid #e0a56e;
+            color: #5c3a1f;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 2.5rem;
+            font-size: 0.8rem;
+            color: #a48152;
+            border-top: 1px solid #eedfcb;
+            padding-top: 1.2rem;
+        }
+        .illustration {
+            background: #f0e9de;
+            border-radius: 2rem;
+            padding: 0.7rem 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+        /* Стили для блока изображений в ряд */
+        .image-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1rem 0 0.5rem;
+            background: #fefaf4;
+            border-radius: 1.8rem;
+            padding: 0.8rem;
+        }
+        .image-card {
+            flex: 1;
+            min-width: 180px;
+            text-align: center;
+            background: #fff;
+            border-radius: 1.5rem;
+            padding: 0.6rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+            border: 1px solid #eedfc2;
+        }
+        .image-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            background: #fff3e6;
+            display: block;
+            margin: 0 auto;
+        }
+        .image-caption {
+            font-size: 0.75rem;
+            color: #9b6a3a;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        hr {
+            margin: 0.5rem 0;
+            border-color: #eedfcb;
+        }
+        @media (max-width: 780px) {
+            body { padding: 0.6rem; }
+            .advice-panel { padding: 1.2rem; }
+            .symptom-btn { padding: 0.6rem 0.8rem; }
+            .image-row { flex-direction: column; align-items: center; }
+            .image-card { width: 80%; }
+        }
+        button {
+            background: none;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🌿 Сам себе Су Джок доктор</h1>
+        <div class="sub">Кисти и стопы — ваши маленькие клиники здоровья</div>
+        <div class="intro">
+            ⚡ В каждом из нас — четыре природные «клиники»: две кисти и две стопы.  
+            Нажатие на болезненные точки соответствия запускает естественные механизмы исцеления.  
+            Выберите симптом — получите простые и эффективные приёмы самопомощи по книге профессора Пак Чжэ Ву.
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <!-- Блок симптомов -->
+        <div class="symptoms-panel">
+            <h2>📋 Частые жалобы</h2>
+            <div class="symptom-list" id="symptom-list">
+                <!-- динамическое заполнение -->
+            </div>
+            <div class="illustration">
+                🖐️ Кисть — пульт управления телом<br>
+                🦶 Стопа — вторая копия здоровья
+            </div>
+        </div>
+
+        <!-- Блок с рекомендациями -->
+        <div class="advice-panel" id="advice-panel">
+            <div class="advice-header">
+                <h2>🍃 Готов помочь себе</h2>
+                <span class="badge">выберите симптом слева</span>
+            </div>
+            <div style="text-align: center; padding: 2rem 0; color: #b48b54;">
+                🌟 Нажмите на любой симптом, чтобы узнать,<br>
+                какие точки стимулировать и как проводить лечение.
+            </div>
+        </div>
+    </div>
+    <div class="footer-note">
+        📖 Метод основан на книге «Сам себе Су Джок доктор» (Пак Чжэ Ву). Информация не заменяет врача, но помогает быстро облегчить состояние. При острых состояниях, высокой температуре или сильной боли — обратитесь к специалисту.
+    </div>
+</div>
+
+<script>
+    // База данных симптомов + рекомендации (из глав книги)
+    const symptomsData = [
+        {
+            id: "cold",
+            title: "🤧 Простуда, насморк, боль в горле",
+            location: "Точки соответствия носу, нёбным миндалинам, гортани, трахее, лёгким. Также все энергетические точки на кистях и стопах. При насморке — середина ногтевых фаланг пальцев (ладонная/подошвенная поверхность).",
+            methods: [
+                "Найдите болезненные точки диагностической палочкой (можно ручкой, карандашом). Массируйте каждую точку 3–5 минут.",
+                "После массажа прогрейте точки полынной сигарой или мини-моксой до глубокого тепла. Можно на подставке из чеснока.",
+                "Закрепите на точках металлические/магнитные звёздочки или семена (редис, чёрный перец, гречиха) на 6–12 часов, периодически надавливая.",
+                "При боли в горле: компресс с мёдом или водкой на первую фалангу большого пальца (соответствие шее) на 6–10 часов.",
+                "Профилактика: ежедневно прогревайте энергетические точки на кистях и стопах."
+            ],
+            note: "При первых симптомах прогревайте точки носа, гортани, миндалин. Если промочили ноги — дополнительно стимулируйте почки и мочевой пузырь."
+        },
+        {
+            id: "cough",
+            title: "🌬️ Кашель (сухой или влажный)",
+            location: "Стандартная система: зоны соответствия гортани, трахее, бронхам, лёгким. В системе «насекомого» — средние фаланги пальцев (грудная клетка).",
+            methods: [
+                "Интенсивный массаж зоны соответствия лёгким роликом или пальцами до покраснения и тепла.",
+                "При сухом кашле: прогревание мини-моксами на чесночной подставке самых болезненных точек. Можно втирать сок чеснока у основания ногтей больших пальцев.",
+                "При влажном кашле: линейный массаж от проекции лёгких к проекции носа (направление выдоха). Используйте семена (гречиха, яблочные косточки) как длинные магниты по ходу отхождения мокроты.",
+                "Поставить горчичник на зону соответствия грудной клетке на кисти или стопе на 5–20 мин.",
+                "При приступообразном кашле — закрепить гречишное зерно на межфаланговом суставе большого пальца."
+            ],
+            note: "Сухой кашель: акцент на прогревание и увлажнение. Влажный — улучшение отхождения мокроты массажем по ходу дыхательных путей."
+        },
+        {
+            id: "headache",
+            title: "🤕 Головная боль",
+            location: "Кончики пальцев, ногтевые фаланги (лоб — кончик, затылок — тыльная сторона, виски — боковые поверхности). Дополнительно — проекции желчного пузыря, желудка, мочевого пузыря в зависимости от локализации боли.",
+            methods: [
+                "Массируйте болезненные точки на пальцах диагностической палочкой 2–5 минут. Часто боль уходит сразу.",
+                "Если не прошла полностью — прикрепите семена (гречиха, редис) или звёздочки на 6–8 часов, периодически нажимая.",
+                "При головной боли из-за давления: наложите эластичную резинку на большой палец (область головного мозга) на 7–10 мин, затем резко снимите.",
+                "Прогрейте точки соответствия затылку, шейному отделу позвоночника моксой.",
+                "Кончики пальцев закрасьте чёрным фломастером для снижения давления."
+            ],
+            note: "Если боль в висках — ищите точки желчного пузыря, в затылке — мочевого пузыря, в лбу — желудка."
+        },
+        {
+            id: "heart",
+            title: "💔 Боль в области сердца",
+            location: "Стандартная система кисти: область тенара (мышечное возвышение) слева от линии симметрии. Система «насекомого» — средняя фаланга любого пальца (чуть ниже середины).",
+            methods: [
+                "Энергично массируйте зону соответствия сердцу пальцами или тупым концом ручки, прерывисто надавливая 3–5 мин.",
+                "После уменьшения боли — прогревание моксами (мужчинам нечётное кол-во, женщинам чётное). Хорошо использовать нитевидные моксы в мини-системах.",
+                "Закрепите семена тыквы, калины, кабачка (форма напоминает сердце) на зоне соответствия на сутки, надавливая несколько раз в час.",
+                "Можно поставить маленький горчичник на проекцию сердца до ощущения жжения."
+            ],
+            note: "⚠️ Боль в сердце требует врачебного контроля! При стенокардии дополните методы стандартной помощью, но обязательно вызовите врача, если боль сильная или не проходит."
+        },
+        {
+            id: "back",
+            title: "🦴 Боль в спине (позвоночник)",
+            location: "Система «насекомого»: по тыльной поверхности каждого пальца вдоль линии симметрии — проекция позвоночника. Также на Ян-поверхностях кистей и стоп.",
+            methods: [
+                "Самый простой способ: прокатывайте эластичное кольцо по каждому пальцу до тепла и покраснения (3–10 мин) — часто боль снимается мгновенно.",
+                "Найдите болезненные точки в зоне проекции поясницы, массируйте палочкой или пальцем.",
+                "Прикрепите цепочку из семян (гречиха, чёрный перец, горох) вдоль проекции позвоночника. Нажимайте на семена.",
+                "Прогрейте зону полынной сигарой, особенно при переохлаждении. Перцовый пластырь на область соответствия на ночь."
+            ],
+            note: "Регулярный массаж пальцев кольцом — отличная профилактика болей в спине и остеохондроза."
+        },
+        {
+            id: "joints",
+            title: "🦵 Боли в суставах (артрит)",
+            location: "Стандартная система: суставы рук на II и V пальцах, суставы ног — на III и IV пальцах. В системе «насекомого» — проекции на суставы пальцев.",
+            methods: [
+                "Массаж поражённых суставов эластичным кольцом до стойкого тепла.",
+                "Прогревание мини-моксами болезненных точек соответствия 1–2 раза в день.",
+                "Семянотерапия: семена редиса, гречихи, проса, шиповника фиксируют пластырем на точки соответствия, меняют раз в сутки.",
+                "Закрасьте зону зелёным цветом, используйте кусочки янтаря или металлические звёздочки."
+            ],
+            note: "При полиартрите массируйте все пальцы и суставы кистей, стоп. Тепловые процедуры особенно эффективны."
+        },
+        {
+            id: "indigestion",
+            title: "🍲 Несварение, тяжесть, тошнота",
+            location: "Проекция желудка, двенадцатиперстной кишки, пищевода, пупка на ладони. Точка «входа» в желудок — центр треугольника у лучезапястной складки.",
+            methods: [
+                "Найдите точку «входа» в желудок, массируйте по часовой стрелке пальцем или палочкой 2–3 мин.",
+                "Сделайте линейный массаж от проекции рта к двенадцатиперстной кишке (направление эвакуации пищи).",
+                "Прикрепите семена (лён, яблоко, тыква) цепочкой по ходу пищевода-желудка, чтобы энергия семян совпадала с движением пищи.",
+                "Закрасьте зоны пищеварения зелёным цветом, поставьте звёздочки на точки желудка и пупка."
+            ],
+            note: "При сильных болях в животе — срочно к врачу! Методы помогают при функциональных нарушениях, переедании."
+        },
+        {
+            id: "constipation",
+            title: "🚽 Запор",
+            location: "Область соответствия толстой кишке — на ладони окаймляет тонкую кишку, идёт по периметру.",
+            methods: [
+                "Массируйте зону толстой кишки круговыми движениями по часовой стрелке (направление перистальтики).",
+                "Найдите болезненные точки, промассируйте диагностической палочкой.",
+                "Приклейте цепочку семян (лён, арбуз, яблоко, виноград) по ходу толстой кишки, чтобы поток энергии совпадал с движением содержимого.",
+                "Прогрейте проекцию толстой кишки полынной сигарой утюжащими движениями.",
+                "Регулярно делайте массаж ладоней грецким орехом или роликом."
+            ],
+            note: "Пить больше воды, клетчатка + Су Джок массаж улучшают моторику."
+        },
+        {
+            id: "fatigue",
+            title: "⚡ Упадок сил, хроническая усталость",
+            location: "Энергетические (базисные) точки на Инь и Ян поверхностях кистей и стоп. Также точки соответствия гипофизу, щитовидной железе, надпочечникам, пупку.",
+            methods: [
+                "Прогревайте все энергетические точки моксами до глубокого тепла (мужчины — нечётное кол-во, женщины — чётное).",
+                "Прогрейте точки пупка, гипофиза, надпочечников. Можно использовать мини-моксы.",
+                "После прогревания поставьте семена шиповника, фасоли или магнитные звёздочки.",
+                "Массируйте каждый палец эластичным кольцом зелёного или красного цвета ежедневно."
+            ],
+            note: "Процедуры лучше делать вечером, перед сном. Восстанавливает энергетический потенциал."
+        },
+        {
+            id: "menses",
+            title: "🌸 Болезненные менструации",
+            location: "Зоны соответствия матке, яичникам, гипофизу (стандартная система кисти/стопы, мини-системы на II–V пальцах). Поясница — в системе «насекомого».",
+            methods: [
+                "Найдите болезненные точки матки, яичников, гипофиза. Массируйте пальцем или палочкой 3–5 минут — боль стихает.",
+                "При скудных выделениях — прогревание моксами на стопах. При обильных — лёд на проекцию матки и закрашивание точек чёрным цветом (без прогревания).",
+                "Закрепите семена (яблоко, виноград, свекла, шиповник) на зоне матки и яичников. Можно покрыть всю зону красным цветом.",
+                "Прокатывайте эластичное кольцо по пальцам, стимулируя поясничный отдел.",
+                "Для успокоения: массажный шарик между ладонями, прогревание энергетических точек Инь."
+            ],
+            note: "За 2–3 дня до цикла начинайте прогревания и семянотерапию — это снизит болезненность."
+        }
+    ];
+
+    // Функция рендеринга симптомов
+    function renderSymptoms() {
+        const container = document.getElementById('symptom-list');
+        if (!container) return;
+        container.innerHTML = '';
+        symptomsData.forEach(symptom => {
+            const btn = document.createElement('button');
+            btn.className = 'symptom-btn';
+            btn.setAttribute('data-id', symptom.id);
+            btn.innerHTML = `<span class="emoji-icon">${symptom.title.split(' ')[0]}</span><span>${symptom.title}</span>`;
+            btn.addEventListener('click', () => {
+                setActiveSymptom(symptom.id);
+                showAdvice(symptom);
+            });
+            container.appendChild(btn);
+        });
+    }
+
+    let activeId = null;
+    function setActiveSymptom(id) {
+        activeId = id;
+        const allBtns = document.querySelectorAll('.symptom-btn');
+        allBtns.forEach(btn => {
+            const btnId = btn.getAttribute('data-id');
+            if (btnId === id) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    // Функция создания блока с двумя картинками (обновлённые подписи)
+    function getImagesRowHtml() {
+        return `
+            <div class="image-row">
+                <div class="image-card">
+                    <img src="https://i.postimg.cc/Hk7RgDCk/su6.png" alt="Стандартная система соответствия на ладони" loading="lazy" onerror="this.src='https://via.placeholder.com/200x150?text=Ладонь+схема'">
+                    <div class="image-caption">🖐️ Стандартная система соответствия на ладони</div>
+                </div>
+                <div class="image-card">
+                    <img src="https://i.postimg.cc/9McnZDwS/su7.png" alt="Стандартная система соответствия на тыльной стороне кисти" loading="lazy" onerror="this.src='https://via.placeholder.com/200x150?text=Тыльная+сторона+кисти'">
+                    <div class="image-caption">✋ Стандартная система соответствия на тыльной стороне кисти</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function showAdvice(symptom) {
+        const panel = document.getElementById('advice-panel');
+        if (!panel) return;
+
+        let methodsHtml = '';
+        if (symptom.methods && symptom.methods.length) {
+            methodsHtml = `<div class="section-title">🖐️ Как проводить стимуляцию:</div>`;
+            symptom.methods.forEach((step, idx) => {
+                methodsHtml += `<div class="howto-step"><strong>${idx+1}. </strong>${step}</div>`;
+            });
+        }
+
+        let noteHtml = '';
+        if (symptom.note) {
+            noteHtml = `<div class="warning-note">📌 Важно: ${symptom.note}</div>`;
+        }
+
+        // Добавляем картинки сразу после блока "Где искать точки"
+        const imagesHtml = getImagesRowHtml();
+
+        const html = `
+            <div class="advice-header">
+                <h2>${symptom.title}</h2>
+                <span class="badge">Су Джок самопомощь</span>
+            </div>
+            <div class="section-title">📍 Где искать точки соответствия</div>
+            <div class="point-location">
+                ${symptom.location}
+            </div>
+            ${imagesHtml}
+            ${methodsHtml}
+            ${noteHtml}
+            <div class="illustration" style="margin-top: 1rem;">
+                ✨ Помните: найдите самую болезненную точку — именно её нужно стимулировать. Массаж, прогревание, семена и магниты активируют восстановление.
+            </div>
+        `;
+        panel.innerHTML = html;
+    }
+
+    // инициализация
+    function init() {
+        renderSymptoms();
+        if (symptomsData.length) {
+            const first = symptomsData[0];
+            setActiveSymptom(first.id);
+            showAdvice(first);
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
